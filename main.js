@@ -18,7 +18,7 @@ class PlayerMissile {
         const { w, h, d } = {w: 5, h: 5, d: 5};
         const geometry = new THREE.BoxGeometry( w, h, d );
         const material = new THREE.MeshPhongMaterial({
-            color: 0x0000ff
+            color: 0xffff00
         });
         this.mesh = new THREE.Mesh( geometry, material );
         this.mesh.castShadow = true;
