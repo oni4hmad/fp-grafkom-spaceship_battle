@@ -6,26 +6,83 @@ import * as dat from "./node_modules/three/examples/jsm/libs/dat.gui.module.js";
 import { addLight } from "./js/lights.js"
 import { Player } from "./js/Sprite/Player.js"
 import { Alien } from "./js/Sprite/Alien.js"
+import { Boss } from "./js/Sprite/Boss.js";
 
 // Commons
 export const commons = Object.freeze ({
     BOARD_MAX_X: 180,
     BOARD_MIN_X: -180,
-    BOARD_MAX_Z: 180,
+    BOARD_MAX_Z: 200, // default: 180
     BOARD_MIN_Z: -180,
     
     ALIEN_WIDTH: 20,
     ALIEN_HEIGHT: 20,
     ALIEN_DEPTH: 20,
+    
+    BOSS_WIDTH: 40,
+    BOSS_HEIGHT: 40,
+    BOSS_DEPTH: 40,
 
     PLAYER_WIDTH: 20,
     PLAYER_HEIGHT: 20,
     PLAYER_DEPTH: 20,
 })
 
+// Game
+export const game = {
+    level: 1,
+    score: 0,
+    end: false,
+    isPaused: false,
+    isAnimating: false,
+    gameOver: function() {
+        game.end = true;
+    },
+    levelUp: function () {
+        game.level++;
+        game.reload();
+    },
+    restart: function () {
+        this.disposeSprite();
+        game.level = 1;
+        game.score = 0;
+        game.end = false;
+        initGame();
+        if (!game.isAnimating)
+            animate()
+    },
+    reload: function () {
+        this.disposeSprite();
+        game.end = false;
+        initGame();
+        if (!game.isAnimating)
+            animate()
+    },
+    togglePause: function () {
+        if(!this.isPaused) {
+            game.isPaused = true;
+            game.end = true;
+        } else {
+            game.isPaused = false;
+            game.end = false;
+            animate()
+        }
+    },
+    disposeSprite: function () {
+        if (aliens.length > 0)
+            aliens.forEach(a => a.dispose())
+        aliens = []
+        player.dispose()
+        player = null;
+        if (boss)
+            boss.dispose()
+        boss = null;
+    },
+}
+
 // implementation
 export let scene, camera, renderer, controls;
-let player, aliens = [];
+let player, aliens = [], boss;
 let gui;
 
 let init = function () {
@@ -56,6 +113,7 @@ let init = function () {
 
     // Keyboard Event Listener
     document.addEventListener("keydown", e => {
+        if (!player || game.isPaused) return;
         if (e.code == "KeyA") {
             player.moveLeft = true;
         } else if (e.code == "KeyD") {
@@ -63,6 +121,7 @@ let init = function () {
         }
     });
     document.addEventListener("keyup", e => {
+        if (!player || game.isPaused) return;
         if (e.code == "KeyA") {
             player.moveLeft = false;
         } else if (e.code == "KeyD") {
@@ -71,20 +130,15 @@ let init = function () {
             player.initMissile();
         }
     });
-
-    // -----------------------------------
-
-    // Object (Geometry)
-    player = new Player();
-
-    const alien_row = 5;
-    const alien_col = 11;
-    const distance = 10;
-    for(let i = 0; i < alien_row; i++) {
-        for(let j = 0; j < alien_col; j++) {
-            aliens.push(new Alien((commons.ALIEN_WIDTH * j + distance * j) + commons.BOARD_MIN_X, (commons.ALIEN_DEPTH * i + distance * i) + + commons.BOARD_MIN_Z));
+    document.addEventListener("keyup", e => {
+        if (e.code == "Enter") {
+            game.reload()
+        } else if (e.code == "KeyP") {
+            game.togglePause()
+        } else if (e.code == "Backspace") {
+            game.restart()
         }
-    }
+    });
 
     // Light
     addLight(scene);
@@ -99,8 +153,27 @@ let init = function () {
     gridHelper.position.y = 0;
     gridHelper.position.x = 0;
     scene.add( gridHelper );
+}
+
+let initGame = function () {
+    player = new Player();
+    if (game.level % 2 == 1) {
+        // alien biasa
+        const alien_row = 5;
+        const alien_col = 11;
+        const distance = 10;
+        for(let i = 0; i < alien_row; i++) {
+            for(let j = 0; j < alien_col; j++) {
+                aliens.push(new Alien((commons.ALIEN_WIDTH * j + distance * j) + commons.BOARD_MIN_X, (commons.ALIEN_DEPTH * i + distance * i) + commons.BOARD_MIN_Z));
+            }
+        }
+    } else {
+        // boss
+        boss = new Boss(0, commons.BOARD_MIN_Z);
+    }
 
     // Dat GUI
+    if (gui) gui.destroy();
     gui = new dat.GUI()
     let guiFolder = gui.addFolder('Camera Adjustment')
     guiFolder.add(camera.position, 'x', -500, 500)
@@ -109,9 +182,11 @@ let init = function () {
     guiFolder.open()
     guiFolder = gui.addFolder('Player Adjustment')
     guiFolder.add(player, 'x', -500, 500)
-    guiFolder.add(player.mesh.position, 'z', -500, 500)
+    guiFolder.add(player, 'z', -500, 500)
     guiFolder.open()
-
+    guiFolder = gui.addFolder('Game Adjustment')
+    guiFolder.add(game, 'level', 0, 100).step(1)
+    guiFolder.open()
     // Debug
     console.log(aliens.at(-1));
 }
@@ -120,12 +195,51 @@ let init = function () {
 let fps = 60;
 const animate = function() {
     setTimeout( function() {
-        if (player.isAlive)
+        if (!game.end) {
+            game.isAnimating = true;
             requestAnimationFrame( animate );
+        } else {
+            game.isAnimating = false;
+            console.log("requestAnimationFrame ended.")
+        }
     }, 1000 / fps );
 
-    player.move();
-    player.missiles.forEach(m => m.move())
+    // player move, player missile move
+    if (player) {
+        player.move();
+        player.missiles.forEach(m => m.move())
+    }
+
+    // boss move, boss init missile
+    if (boss) {
+        boss.move()
+        boss.initMissile();
+        boss.moveMissile();
+        boss.checkCollide([...player.missiles, player]);
+        player.checkCollide([...boss.missiles])
+        if (boss.x >= commons.BOARD_MAX_X) {
+            boss.setMoveToLeft()
+        } else if (boss.x <= commons.BOARD_MIN_X) {
+            boss.setMoveToRight()
+        }
+    }
+
+    // update aliens
+    if (aliens.length >= 1) {
+        aliens.forEach(a => {
+            if (!a.isAlive) {
+                let idx = aliens.indexOf(a);
+                if (idx > -1) aliens.splice(idx, 1);
+                // level up if all aliens died
+                if (aliens.length <= 0) {
+                    console.log('level up!')
+                    game.levelUp()
+                }
+            }
+        })
+    }
+
+    // collision check, alien move, alien init missile
     aliens.forEach(alien => {
         if (alien.isAlive){
             alien.move();
@@ -135,12 +249,10 @@ const animate = function() {
             alien.mesh.rotation.y += 0.04;
             alien.checkCollide([...player.missiles, player]);
             player.checkCollide([...alien.missiles])
-
-            // let isStartCollide = (player.missiles.length > 0) && (aliens.at(-1).z + aliens.at(-1).depth/2 >= player.missiles.at(0).z + player.missiles.at(0).depth/2);
-            // if (isStartCollide) {
-            // }
         }
     })
+    
+    // aliens geser kanan-kiri
     for (let alien of aliens) {
         if (alien.x >= commons.BOARD_MAX_X) {
             aliens.forEach(a => a.setMoveToLeft())
@@ -152,10 +264,10 @@ const animate = function() {
     }
 
     gui.updateDisplay();
-
     controls.update();
     renderer.render(scene, camera);
 }
 
 init();
+initGame();
 animate();
