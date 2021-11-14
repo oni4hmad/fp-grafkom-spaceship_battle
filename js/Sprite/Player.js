@@ -74,8 +74,8 @@ export class Player {
                 this.dispose();
             }
         }
-        this.dispose = () => {
-            if (!this.isAlive)
+        this.dispose = (isReload = false) => {
+            if (!isReload)
                 game.gameOver();
             // remove all missiles
             while (this.missiles.length)

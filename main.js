@@ -86,7 +86,7 @@ export const game = {
         if (aliens.length > 0)
             aliens.forEach(a => a.dispose())
         aliens = []
-        player.dispose()
+        player.dispose(true)
         player = null;
         if (boss)
             boss.dispose()
