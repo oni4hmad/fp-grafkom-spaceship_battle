@@ -140,6 +140,14 @@ class PlayerMissile {
             // this.mesh.geometry.computeBoundingBox();
             this.boundingBox.setFromObject(this.mesh);
         }
+        this.checkCollide = objectList => {
+            objectList.forEach(anyObj => {
+                if (this.boundingBox.intersectsBox(anyObj.boundingBox)){
+                    anyObj.dispose();
+                    this.dispose();
+                }
+            })
+        }
         this.dispose = () => {
             // remove missile from player
             this.player.removeMissile(this);

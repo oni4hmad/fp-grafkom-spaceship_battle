@@ -143,6 +143,8 @@ let init = function () {
     // Light
     addLight(scene);
 
+    // Panorama
+
     // Controls
     controls = new OrbitControls(camera, renderer.domElement);
     controls.minDistance = 1;
@@ -217,6 +219,7 @@ const animate = function() {
         boss.moveMissile();
         boss.checkCollide([...player.missiles, player]);
         player.checkCollide([...boss.missiles])
+        player.missiles.forEach(pm => pm.checkCollide([...boss.missiles]))
         if (boss.x >= commons.BOARD_MAX_X) {
             boss.setMoveToLeft()
         } else if (boss.x <= commons.BOARD_MIN_X) {
@@ -249,6 +252,7 @@ const animate = function() {
             alien.mesh.rotation.y += 0.04;
             alien.checkCollide([...player.missiles, player]);
             player.checkCollide([...alien.missiles])
+            player.missiles.forEach(pm => pm.checkCollide([...alien.missiles]))
         }
     })
     
