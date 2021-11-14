@@ -48,7 +48,7 @@ export class Player {
             else if (this.moveLeft)
                 this.x -= this.speed;
             this.boxHelper.update();
-            this.mesh.geometry.computeBoundingBox();
+            // this.mesh.geometry.computeBoundingBox();
             this.boundingBox.setFromObject(this.mesh);
         }
         this.removeMissile = (missile) => {
@@ -137,7 +137,7 @@ class PlayerMissile {
         this.move = () => {
             this.z += this.speedZ;
             this.boxHelper.update();
-            this.mesh.geometry.computeBoundingBox();
+            // this.mesh.geometry.computeBoundingBox();
             this.boundingBox.setFromObject(this.mesh);
         }
         this.dispose = () => {

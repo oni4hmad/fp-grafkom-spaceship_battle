@@ -32,14 +32,14 @@ export class Alien {
         this.missiles = [];
 
         this.isAlive = true;
-        this.missileRate = 0.025 + (game.level * 0.025); // % rate
+        this.missileRate = 0.025 + (game.level * 0.011); // % rate
         this.maxMissile = 1 + Math.floor(game.level/2);
 
         this.move = () => {
             this.x += this.speedX;
             this.z += this.speedZ;
             this.boxHelper.update();
-            this.mesh.geometry.computeBoundingBox();
+            // this.mesh.geometry.computeBoundingBox();
             this.boundingBox.setFromObject(this.mesh);
         }
         this.initMissile = () => {
@@ -146,7 +146,7 @@ class AlienMissile {
         this.move = () => {
             this.z += this.speedZ;
             this.boxHelper.update();
-            this.mesh.geometry.computeBoundingBox();
+            // this.mesh.geometry.computeBoundingBox();
             this.boundingBox.setFromObject(this.mesh);
         }
         this.dispose = () => {

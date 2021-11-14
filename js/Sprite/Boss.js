@@ -33,14 +33,14 @@ export class Boss {
         this.health = 5 * game.level;
 
         this.isAlive = true;
-        this.missileRate = game.level * 0.5; // % rate
+        this.missileRate = game.level * 0.25; // % rate
         this.maxMissile = 1 * Math.floor(game.level/2);
 
         this.move = () => {
             this.x += this.speedX;
             this.z += this.speedZ;
             this.boxHelper.update();
-            this.mesh.geometry.computeBoundingBox();
+            // this.mesh.geometry.computeBoundingBox();
             this.boundingBox.setFromObject(this.mesh);
         }
         this.initMissile = () => {
@@ -169,7 +169,7 @@ class BossMissile {
             this.z += this.speedZ;
             this.x += this.speedX;
             this.boxHelper.update();
-            this.mesh.geometry.computeBoundingBox();
+            // this.mesh.geometry.computeBoundingBox();
             this.boundingBox.setFromObject(this.mesh);
         }
         this.dispose = () => {
