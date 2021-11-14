@@ -26,6 +26,7 @@ export const commons = Object.freeze ({
     PLAYER_WIDTH: 20,
     PLAYER_HEIGHT: 20,
     PLAYER_DEPTH: 20,
+    PLAYER_HEALTH: 3,
 })
 
 // Game
@@ -37,24 +38,36 @@ export const game = {
     isAnimating: false,
     gameOver: function() {
         game.end = true;
+        console.log("Game OVER!");
     },
     levelUp: function () {
         game.level++;
         game.reload();
     },
+    addScore: function (score = 100) {
+        game.score += score;
+        this.updateScore();
+    },
+    updateScore: function () {
+        document.getElementById("score-value").innerHTML = game.score;
+    },
+    updateHealth: function (health) {
+        document.getElementById("health-value").innerHTML = health;
+    },
     restart: function () {
-        this.disposeSprite();
+        game.end = true;
         game.level = 1;
         game.score = 0;
-        game.end = false;
+        this.disposeSprite();
         initGame();
+        game.end = false;
         if (!game.isAnimating)
             animate()
     },
     reload: function () {
         this.disposeSprite();
-        game.end = false;
         initGame();
+        game.end = false;
         if (!game.isAnimating)
             animate()
     },
@@ -158,7 +171,10 @@ let init = function () {
 }
 
 let initGame = function () {
-    player = new Player();
+    if (!player) {
+        player = new Player();
+        player.health = commons.PLAYER_HEALTH;
+    }
     if (game.level % 2 == 1) {
         // alien biasa
         const alien_row = 5;
@@ -190,7 +206,7 @@ let initGame = function () {
     guiFolder.add(game, 'level', 0, 100).step(1)
     guiFolder.open()
     // Debug
-    console.log(aliens.at(-1));
+    console.log("game inited!");
 }
 
 // Render loop

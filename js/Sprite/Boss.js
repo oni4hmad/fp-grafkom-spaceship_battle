@@ -74,6 +74,7 @@ export class Boss {
         this.checkCollide = objectList => {
             objectList.forEach(anyObj => {
                 if (this.boundingBox.intersectsBox(anyObj.boundingBox)){
+                    game.addScore();
                     anyObj.dispose();
                     gotAttack();
                 }

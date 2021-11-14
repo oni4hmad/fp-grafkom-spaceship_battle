@@ -63,6 +63,7 @@ export class Alien {
         this.checkCollide = objectList => {
             objectList.forEach(anyObj => {
                 if (this.boundingBox.intersectsBox(anyObj.boundingBox)){
+                    game.addScore();
                     this.isAlive = false;
                     anyObj.dispose();
                     this.dispose();
@@ -106,7 +107,7 @@ export class Alien {
         if (this.mesh.position.z > commons.BOARD_MAX_Z - commons.ALIEN_DEPTH/2){
             game.gameOver();
             this.dispose();
-            console.log("alien take over you!")
+            console.log("Alien invasion!")
         } else if (this.mesh.position.z < commons.BOARD_MIN_Z) {
             this.mesh.position.z = commons.BOARD_MIN_Z
         }

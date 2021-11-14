@@ -26,6 +26,8 @@ export class Player {
 
         this.speed = 3;
         this.health = 3;
+        game.updateHealth(this.health);
+        
         this.missiles = [];
         this.maxMissile = 2 + game.level;
 
@@ -65,6 +67,7 @@ export class Player {
         }
         const gotAttack = (damage = 1) => {
             this.health -= damage;
+            game.updateHealth(this.health);
             console.log(`Player Health: ${this.health}`)
             if (this.health <= 0) {
                 this.dispose();
