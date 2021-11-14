@@ -32,7 +32,7 @@ export class Alien {
         this.missiles = [];
 
         this.isAlive = true;
-        this.missileRate = 0.025 + (game.level * 0.011); // % rate
+        this.missileRate = 0.025 + (game.level * 0.015); // % rate
         this.maxMissile = 1 + Math.floor(game.level/2);
 
         this.move = () => {

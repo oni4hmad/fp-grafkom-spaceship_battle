@@ -27,7 +27,7 @@ export class Player {
         this.speed = 3;
         this.health = 3;
         this.missiles = [];
-        this.maxMissile = game.level;
+        this.maxMissile = 2 + game.level;
 
         this.moveRight = false;
         this.moveLeft = false;
