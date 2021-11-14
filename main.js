@@ -59,6 +59,7 @@ export const game = {
         game.level = 1;
         game.score = 0;
         this.disposeSprite();
+        this.updateScore();
         initGame();
         game.end = false;
         if (!game.isAnimating)
