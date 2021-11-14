@@ -70,12 +70,13 @@ export class Player {
             game.updateHealth(this.health);
             console.log(`Player Health: ${this.health}`)
             if (this.health <= 0) {
+                this.isAlive = false;
                 this.dispose();
             }
         }
         this.dispose = () => {
-            game.gameOver();
-            this.isAlive = false;
+            if (!this.isAlive)
+                game.gameOver();
             // remove all missiles
             while (this.missiles.length)
                 this.missiles.pop().dispose()
