@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spaceship Battle</title>
+
+    <!-- bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
     <style>
         * {
             margin: 0;
             padding: 0;
         }
+
         body {
             background-color: black;
         }
+
         .text {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             font-size: 20pt;
@@ -25,27 +33,107 @@
             z-index: 100;
             display: block;
         }
+
         .text#score-txt {
             left: 10px;
         }
+
         .text#score-value {
             left: 90px;
         }
+
         .text#health-txt {
             top: 45px;
             left: 10px;
         }
+
         .text#health-value {
             top: 45px;
             left: 105px;
         }
+
+        #fill {
+            position: fixed;
+            background: black;
+            min-height: 100%;
+            height: 100vh;
+            min-width: 100%;
+            width: 100vh;
+            opacity: 0.75;
+        }
+
+        .row {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .text-ui {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: rgb(255, 255, 255);
+            /*white text*/
+            font-weight: bold;
+        }
+
+        /* hide element */
+        #fill {
+            display: none;
+        }
+        #gameover {
+            display: none;
+        }
+        #pause {
+            display: none;
+        }
     </style>
 </head>
+
 <body>
     <div class="text" id="score-txt">Score:</div>
     <div class="text" id="score-value">0</div>
     <div class="text" id="health-txt">Health:</div>
     <div class="text" id="health-value">3</div>
     <script type="module" src="./main.js"></script>
+
+    <!-- background -->
+    <div id="fill" class="container"></div>
+
+    <!-- gameover ui -->
+    <div id="gameover" class="container">
+        <div class="row row-cols-1">
+            <div class="col-lg-1"></div>
+            <div class="text-ui col-lg-12">
+                <h1 style="text-align:center;">Game Over</h1>
+            </div>
+            <div class="text-ui col-lg-12">
+                <h4 style="text-align:center;">Press Enter to Restart</h4>
+            </div>
+            <div class="col-lg-1"></div>
+        </div>
+    </div>
+
+    <!-- pause ui -->
+    <div id="pause" class="container">
+        <div class="row row-cols-1">
+            <div class="col-lg-1"></div>
+            <div class="text-ui col-lg-12">
+                <h1 style="text-align:center;">Pause</h1>
+            </div>
+            <div class="text-ui col-lg-12">
+                <h4 style="text-align:center;">Press P to Resume</h4>
+            </div>
+            <div class="col-lg-1"></div>
+        </div>
+    </div>
+
+    <!-- bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+        integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+        integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>

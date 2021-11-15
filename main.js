@@ -37,6 +37,8 @@ export const game = {
     isPaused: false,
     isAnimating: false,
     gameOver: function() {
+        document.getElementById("gameover").style.display = "block";
+        document.getElementById("fill").style.display = "block";
         game.end = true;
         console.log("Game OVER!");
     },
@@ -55,6 +57,8 @@ export const game = {
         document.getElementById("health-value").innerHTML = health;
     },
     restart: function () {
+        document.getElementById("gameover").style.display = "none";
+        document.getElementById("fill").style.display = "none";
         game.end = true;
         game.level = 1;
         game.score = 0;
@@ -74,9 +78,13 @@ export const game = {
     },
     togglePause: function () {
         if(!this.isPaused) {
+            document.getElementById("pause").style.display = "block";
+            document.getElementById("fill").style.display = "block";
             game.isPaused = true;
             game.end = true;
         } else {
+            document.getElementById("pause").style.display = "none";
+            document.getElementById("fill").style.display = "none";
             game.isPaused = false;
             game.end = false;
             animate()
@@ -146,12 +154,21 @@ let init = function () {
     });
     document.addEventListener("keyup", e => {
         if (e.code == "Enter") {
-            game.reload()
+            game.restart()
         } else if (e.code == "KeyP") {
             game.togglePause()
         } else if (e.code == "Backspace") {
-            game.restart()
-        }
+            game.reload()
+        } 
+        
+        // show or hide html element
+        // else if (e.code == "KeyA") {
+        //     document.getElementById("gameover").style.display = "none";
+        //     document.getElementById("fill").style.display = "none";
+        // } else if (e.code == "KeyD") {
+        //     document.getElementById("gameover").style.display = "block";
+        //     document.getElementById("fill").style.display = "block";
+        // }
     });
 
     // Light

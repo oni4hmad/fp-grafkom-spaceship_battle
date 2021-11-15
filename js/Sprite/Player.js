@@ -136,7 +136,7 @@ class PlayerMissile {
         this.width = w;
         this.height = h;
         this.depth = d;
-        this.speedZ = -5;
+        this.speedZ = -10;
 
         this.move = () => {
             this.z += this.speedZ;
