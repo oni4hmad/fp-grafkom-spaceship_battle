@@ -159,16 +159,7 @@ let init = function () {
             game.togglePause()
         } else if (e.code == "Backspace") {
             game.reload()
-        } 
-        
-        // show or hide html element
-        // else if (e.code == "KeyA") {
-        //     document.getElementById("gameover").style.display = "none";
-        //     document.getElementById("fill").style.display = "none";
-        // } else if (e.code == "KeyD") {
-        //     document.getElementById("gameover").style.display = "block";
-        //     document.getElementById("fill").style.display = "block";
-        // }
+        }
     });
 
     // Light
