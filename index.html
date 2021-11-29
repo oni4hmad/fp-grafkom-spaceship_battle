@@ -12,6 +12,8 @@
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Outfit&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -62,28 +64,46 @@
             opacity: 0.75;
         }
 
-        .row {
+        .row-center {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
         }
 
-        .text-ui {
+        .text-ui{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             color: rgb(255, 255, 255);
             /*white text*/
             font-weight: bold;
         }
 
+        .text-title {
+            font-family: Orbitron, sans-serif;
+            font-size: 200px;
+            color: rgb(255, 255, 255);
+            /*white text*/
+            font-weight: bold;
+        }
+
+        .text-ui h1, .text-title h1 {
+            color: rgb(255, 196, 0);
+        }
+
         /* hide element */
         #fill {
-            display: none;
+            display: block;
+        }
+        #gamestart {
+            display: block;
         }
         #gameover {
             display: none;
         }
         #pause {
+            display: none;
+        }
+        #bosshealth {
             display: none;
         }
     </style>
@@ -99,31 +119,52 @@
     <!-- background -->
     <div id="fill" class="container"></div>
 
+    <!-- boss health -->
+    <div id="bosshealth" class="container overflow-hidden position-fixed start-50 translate-middle-x ms-5">
+        <div class="row p-3">
+            <div class="text-ui col">
+                <div class="overflow-hidden text-end" id="boss-health-txt">Boss Health:</div>
+            </div>
+            <div class="text-ui col">
+                <div id="boss-health-value">3</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- game start ui -->
+    <div id="gamestart" class="container">
+        <div class="row-center row-cols-1">
+            <div class="text-title col-lg-12">
+                <h1 style="text-align:center;">SPACESHIP</h1>
+                <h1 style="text-align:center;">BATTLE</h1>
+            </div>
+            <div class="text-ui col-lg-12">
+                <h4 style="text-align:center;">Press Enter to Start</h4>
+            </div>
+        </div>
+    </div>
+
     <!-- gameover ui -->
     <div id="gameover" class="container">
-        <div class="row row-cols-1">
-            <div class="col-lg-1"></div>
+        <div class="row-center row-cols-1">
             <div class="text-ui col-lg-12">
                 <h1 style="text-align:center;">Game Over</h1>
             </div>
             <div class="text-ui col-lg-12">
                 <h4 style="text-align:center;">Press Enter to Restart</h4>
             </div>
-            <div class="col-lg-1"></div>
         </div>
     </div>
 
     <!-- pause ui -->
     <div id="pause" class="container">
-        <div class="row row-cols-1">
-            <div class="col-lg-1"></div>
+        <div class="row-center row-cols-1">
             <div class="text-ui col-lg-12">
                 <h1 style="text-align:center;">Pause</h1>
             </div>
             <div class="text-ui col-lg-12">
                 <h4 style="text-align:center;">Press P to Resume</h4>
             </div>
-            <div class="col-lg-1"></div>
         </div>
     </div>
 

@@ -1,18 +1,12 @@
 import * as THREE from "../../node_modules/three/build/three.module.js";
+import { GLTFLoader } from "../../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
 import { scene, renderer } from "../../main.js"
 import { commons, game } from "../../main.js"
 
 export class Player {
-    constructor () {
+    constructor (positionX = 0) {
         const { w, h, d } = {w: commons.PLAYER_WIDTH, h: commons.PLAYER_HEIGHT, d: commons.PLAYER_DEPTH};
-        const geometry = new THREE.BoxGeometry( w, h, d );
-        const material = new THREE.MeshPhongMaterial({
-            color: 0x0fd7ff
-        });
-        this.mesh = new THREE.Mesh( geometry, material );
-        this.mesh.castShadow = true;
-        this.mesh.receiveShadow = true;
-        this.mesh.position.z = 180;
+        this.mesh = initMesh();
         scene.add(this.mesh);
 
         this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
@@ -36,6 +30,38 @@ export class Player {
 
         this.isAlive = true;
 
+        function initMesh() {
+            const geometry = new THREE.BoxGeometry( w, h, d );
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x0fd7ff
+            });
+            const tempMesh = new THREE.Mesh( geometry, material );
+            tempMesh.castShadow = true;
+            tempMesh.receiveShadow = true;
+            tempMesh.position.z = 180;
+            tempMesh.position.x = positionX;
+            return tempMesh;
+            
+            // model loader: low poly spaceship
+            // let tempMesh;
+            // const loader = new GLTFLoader()
+            // loader.load('../../assets/gltf/player/scene.gltf', function(gltf){
+            //     tempMesh = gltf.scene;
+            //     tempMesh.scale.x = w/10;
+            //     tempMesh.scale.y = h/10;
+            //     tempMesh.scale.z = d/10;
+            //     tempMesh.position.z = 180;
+            //     tempMesh.position.x = positionX;
+            //     tempMesh.traverse(n => { 
+            //         if ( n.isMesh ) {
+            //             n.castShadow = true; 
+            //             n.receiveShadow = true;
+            //             n.geometry.computeBoundingBox();
+            //         }
+            //     });
+            // })
+            // return tempMesh;
+        }
         this.initMissile = () => {
             if (this.missiles.length < this.maxMissile) {    
                 const missile = new PlayerMissile(this, this.x, this.z - this.depth/2);

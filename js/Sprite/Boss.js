@@ -31,6 +31,8 @@ export class Boss {
         this.speedZ = 0.1;
         this.missiles = [];
         this.health = 5 * game.level;
+        document.getElementById("bosshealth").style.display = "block";
+        document.getElementById("boss-health-value").innerHTML = this.health;
 
         this.isAlive = true;
         this.missileRate = game.level * 0.25; // % rate
@@ -82,6 +84,7 @@ export class Boss {
         }
         const gotAttack = (damage = 1) => {
             this.health -= damage;
+            document.getElementById("boss-health-value").innerHTML = this.health;
             console.log(`Boss Health: ${this.health}`)
             if (this.health <= 0) {
                 died()
@@ -98,6 +101,7 @@ export class Boss {
             this.speedX = Math.abs(this.speedX);
         }
         this.dispose = () => {
+            document.getElementById("bosshealth").style.display = "none";
             this.isAlive = false;
             // remove all missiles
             while (this.missiles.length)

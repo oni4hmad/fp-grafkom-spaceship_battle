@@ -33,16 +33,20 @@ export const commons = Object.freeze ({
 export const game = {
     level: 1,
     score: 0,
-    end: false,
+    start: false,
     isPaused: false,
     isAnimating: false,
+    last_x_position: 0,
     gameOver: function() {
         document.getElementById("gameover").style.display = "block";
         document.getElementById("fill").style.display = "block";
-        game.end = true;
+        game.start = false;
+        game.last_x_position = 0;
         console.log("Game OVER!");
     },
     levelUp: function () {
+        if (game.start)
+            game.last_x_position = player.x;
         game.level++;
         game.reload();
     },
@@ -57,36 +61,40 @@ export const game = {
         document.getElementById("health-value").innerHTML = health;
     },
     restart: function () {
-        document.getElementById("gameover").style.display = "none";
-        document.getElementById("fill").style.display = "none";
-        game.end = true;
+        if (game.isPaused)
+            this.togglePause();
+        this.clearUI();
+        game.start = false;
+        game.last_x_position = 0;
         game.level = 1;
         game.score = 0;
         this.disposeSprite();
         this.updateScore();
         initGame();
-        game.end = false;
+        game.start = true;
         if (!game.isAnimating)
             animate()
     },
     reload: function () {
+        if (game.isPaused)
+            this.togglePause();
+        this.clearUI();
         this.disposeSprite();
         initGame();
-        game.end = false;
+        game.start = true;
         if (!game.isAnimating)
             animate()
     },
     togglePause: function () {
+        this.clearUI();
         if(!this.isPaused) {
             document.getElementById("pause").style.display = "block";
             document.getElementById("fill").style.display = "block";
             game.isPaused = true;
-            game.end = true;
+            game.start = false;
         } else {
-            document.getElementById("pause").style.display = "none";
-            document.getElementById("fill").style.display = "none";
             game.isPaused = false;
-            game.end = false;
+            game.start = true;
             animate()
         }
     },
@@ -94,12 +102,19 @@ export const game = {
         if (aliens.length > 0)
             aliens.forEach(a => a.dispose())
         aliens = []
-        player.dispose(true)
+        if (player)
+            player.dispose(true)
         player = null;
         if (boss)
             boss.dispose()
         boss = null;
     },
+    clearUI: function () {
+        document.getElementById("gamestart").style.display = "none";
+        document.getElementById("gameover").style.display = "none";
+        document.getElementById("pause").style.display = "none";
+        document.getElementById("fill").style.display = "none";
+    }
 }
 
 // implementation
@@ -166,6 +181,16 @@ let init = function () {
     addLight(scene);
 
     // Panorama
+    const panorama = new THREE.CubeTextureLoader();
+    const textureCube = panorama.load([
+        'assets/panorama/px.png',
+        'assets/panorama/nx.png',
+        'assets/panorama/py.png',
+        'assets/panorama/ny.png',
+        'assets/panorama/pz.png',
+        'assets/panorama/nz.png'
+    ]);
+    scene.background = textureCube;
 
     // Controls
     controls = new OrbitControls(camera, renderer.domElement);
@@ -181,7 +206,7 @@ let init = function () {
 
 let initGame = function () {
     if (!player) {
-        player = new Player();
+        player = new Player(game.last_x_position);
         player.health = commons.PLAYER_HEALTH;
     }
     if (game.level % 2 == 1) {
@@ -214,6 +239,7 @@ let initGame = function () {
     guiFolder = gui.addFolder('Game Adjustment')
     guiFolder.add(game, 'level', 0, 100).step(1)
     guiFolder.open()
+
     // Debug
     console.log("game inited!");
 }
@@ -222,7 +248,7 @@ let initGame = function () {
 let fps = 60;
 const animate = function() {
     setTimeout( function() {
-        if (!game.end) {
+        if (game.start) {
             game.isAnimating = true;
             requestAnimationFrame( animate );
         } else {
@@ -292,11 +318,11 @@ const animate = function() {
         }
     }
 
-    gui.updateDisplay();
+    if (gui) gui.updateDisplay();
     controls.update();
     renderer.render(scene, camera);
 }
 
 init();
-initGame();
+// initGame();
 animate();
