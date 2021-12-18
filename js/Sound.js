@@ -22,40 +22,57 @@ for(let i = 0; i < 15; i++) {
 }
 
 export function alien_beam() {
-    let sound = beam_sounds.pop();
-    beam_sounds.unshift(sound);
-    sound.stop();
-    sound.play();
+    let s = beam_sounds.pop();
+    beam_sounds.unshift(s);
+    s.sound.volume = 0.15;
+    s.stop();
+    s.play();
 }
 
 export function player_bullet() {
-    new Sound('../assets/sounds/bulletSound.wav').play();
+    let s = new Sound('../assets/sounds/bulletSound.wav');
+    s.sound.volume = 0.15;
+    s.play();
 }
 
 export function game_start() {
-    new Sound('../assets/sounds/gameStart.wav').play();
+    let s = new Sound('../assets/sounds/gameStart.wav');
+    s.sound.volume = 0.15;
+    s.play();
 }
 
 export function game_over() {
-    new Sound('../assets/sounds/deathSound.wav').play();
+    let s = new Sound('../assets/sounds/deathSound.wav');
+    s.sound.volume = 0.15;
+    s.play();
 }
 
 export function level_up() {
-    new Sound('../assets/sounds/levelUpSound.wav').play();
+    let s = new Sound('../assets/sounds/levelUpSound.wav');
+    s.sound.volume = 0.15;
+    s.play();
 }
 
 export function boss() {
-    new Sound('../assets/sounds/bossSound.wav').play();
+    let s = new Sound('../assets/sounds/bossSound.wav');
+    s.sound.volume = 0.15;
+    s.play();
 }
 
 export function damage() {
-    new Sound('../assets/sounds/damageSound.wav').play();
+    let s = new Sound('../assets/sounds/damageSound.wav');
+    s.sound.volume = 0.15;
+    s.play();
 }
 
 export function hit() {
-    new Sound('../assets/sounds/hitmarkerSound.wav').play();
+    let s = new Sound('../assets/sounds/hitmarkerSound.wav');
+    s.sound.volume = 0.15;
+    s.play();
 }
 
 export function bonus() {
-    new Sound('../assets/sounds/bonusSound.wav').play();
+    let s = new Sound('../assets/sounds/bonusSound.wav');
+    s.sound.volume = 0.15;
+    s.play();
 }
