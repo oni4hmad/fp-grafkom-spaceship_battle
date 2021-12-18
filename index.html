@@ -136,6 +136,9 @@
         #bosshealth {
             display: none;
         }
+        #power-missile {
+            display: none;
+        }
     </style>
 </head>
 
@@ -149,12 +152,16 @@
     <div class="fixed-bottom ms-2 noselect">
         <img src="assets/img/controls.png" alt="controls">
     </div>
+    <div class="fixed-bottom ms-2 noselect">
+        <img src="assets/img/x3missile_tips_mini.png" alt="controls" style="margin-left: 300px;">
+    </div>
     <div class="fixed-bottom me-2 mb-2 d-block">
         <div class="d-flex flex-row align-content-center justify-content-end">
             <h6 class="noselect p-2 py-1 rounded-3 text-white text-center fw-bolder bg-dark">P - Pause</h6>
         </div>
     </div>
     <script type="module" src="./main.js"></script>
+
 
     <!-- background -->
     <div id="fill" class="container px-0">
@@ -165,8 +172,17 @@
         </div>
     </div>
 
+    <!-- missile power ui -->
+    <div id="power-missile">
+        <div class="fixed-bottom me-2 mb-2 d-block">
+            <div class="d-flex flex-row align-content-center justify-content-end" style="margin-right: 100px;">
+                <h6 class="noselect p-2 py-1 rounded-3 text-white text-center fw-bolder bg-success" id="power-missile-time">x3 Missile (99s)</h6>
+            </div>
+        </div>
+    </div>
+
     <!-- boss health -->
-    <div id="bosshealth" class="container overflow-hidden position-fixed start-50 translate-middle-x ms-5">
+    <div id="bosshealth" class="container overflow-hidden position-fixed start-50 translate-middle-x ms-5 noselect">
         <div class="row p-3">
             <div class="text-ui col">
                 <div class="overflow-hidden text-end" id="boss-health-txt">Boss Health:</div>

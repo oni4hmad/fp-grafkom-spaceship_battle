@@ -67,9 +67,12 @@ export const game = {
     addPower: function () {
         if(player) player.isPowered = true;
         powerClock.start();
+        this.addPowerMissileUI();
+        game.updatePower();
     },
     removePower: function () {
         if(player) player.isPowered = false;
+        this.removePowerMissileUI();
     },
     updateScore: function () {
         document.getElementById("score-value").innerHTML = game.score;
@@ -84,7 +87,10 @@ export const game = {
         if (player && player.isPowered) {
             if (powerClock.getElapsedTime() > game.powerTime) {
                 powerClock.stop();
-                this.removePower();
+                game.removePower();
+            } else {
+                game.updatePowerMissileUI((game.powerTime-powerClock.getElapsedTime()).toFixed(1));
+                setTimeout(game.updatePower, 500);
             }
         }
     },
@@ -110,6 +116,7 @@ export const game = {
             this.togglePause();
         this.clearUI();
         this.disposeSprite();
+        this.removePowerMissileUI();
         initGame();
         game.start = true;
         if (!game.isAnimating)
@@ -154,6 +161,15 @@ export const game = {
         document.getElementById("gameover").style.display = "none";
         document.getElementById("pause").style.display = "none";
         document.getElementById("fill").style.display = "none";
+    },
+    addPowerMissileUI: function() {
+        document.getElementById("power-missile").style.display = "block";
+    },
+    updatePowerMissileUI: function(time) {
+        document.getElementById("power-missile-time").innerHTML = `x3 Missile (${time}s)`;
+    },
+    removePowerMissileUI: function() {
+        document.getElementById("power-missile").style.display = "none";
     },
     isAllObjLoaded: function (...args) {
         for(const obj of args) {
@@ -374,7 +390,6 @@ const animate = function() {
     if (player) {
         player.move();
         player.missiles.forEach(m => m.move())
-        game.updatePower();
     }
 
     // boss move, boss init missile

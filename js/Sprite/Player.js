@@ -91,11 +91,9 @@ export class Player {
                     this.missiles.push(new PlayerMissile(this, this.x - 10, this.z - this.depth/2 + 5));
                     this.missiles.push(new PlayerMissile(this, this.x, this.z - this.depth/2));
                     this.missiles.push(new PlayerMissile(this, this.x + 10, this.z - this.depth/2 + 5));
-                    console.log('power!')
                 } else {
                     const missile = new PlayerMissile(this, this.x, this.z - this.depth/2);
                     this.missiles.push(missile);
-                    console.log('no powert!')
                 }
                 Sound.player_bullet();
             }
