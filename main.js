@@ -44,17 +44,21 @@ export const game = {
     isAnimating: false,
     isLoading: false,
     last_x_position: 0,
+    last_c_targetX: 0,
     gameOver: function() {
         document.getElementById("gameover").style.display = "block";
         document.getElementById("fill").style.display = "block";
         game.start = false;
         game.last_x_position = 0;
+        game.last_c_targetX = 0;
         Sound.game_over();
         console.log("Game OVER!");
     },
     levelUp: function () {
-        if (game.start)
+        if (game.start) {
             game.last_x_position = player.x;
+            game.last_c_targetX = controls.target.x;
+        }
         game.level++;
         this.updateLevel();
         game.reload();
@@ -310,7 +314,7 @@ let init = function () {
 
 let initGame = function () {
     if (!player) {
-        player = new Player(game.last_x_position);
+        player = new Player(game.last_x_position, game.last_c_targetX);
         player.health = commons.PLAYER_HEALTH;
     }
 

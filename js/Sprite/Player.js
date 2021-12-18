@@ -5,7 +5,7 @@ import { commons, game } from "../../main.js"
 import * as Sound from "../Sound.js"
 
 export class Player {
-    constructor (positionX = 0) {
+    constructor (positionX = 0, cTargetX = 0) {
         const { w, h, d } = {w: commons.PLAYER_WIDTH, h: commons.PLAYER_HEIGHT, d: commons.PLAYER_DEPTH};
 
         this.isLoaded = false;
@@ -66,7 +66,7 @@ export class Player {
                     model.position.z = commons.BOARD_MAX_Z;
                     model.position.x = positionX;
                     camera.position.x = positionX;
-                    controls.target.x = positionX;
+                    controls.target.x = cTargetX;
                     // model.rotation.y = Math.PI / 2; // rotasi 90d
                     model.traverse(n => { 
                         if ( n.isMesh ) {
