@@ -117,7 +117,6 @@ export class Alien {
                     const missile = new AlienMissile(this, this.x, this.z + this.depth/2);
                     this.missiles.push(missile);
                     Sound.alien_beam();
-                    // this.sound_shoot.play();
                 }
             }
         }

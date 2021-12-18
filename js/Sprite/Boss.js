@@ -25,6 +25,7 @@ export class Boss {
             // this.sound_levelUp = new Sound('../../assets/sounds/levelUpSound.wav');
 
             this.isLoaded = true;
+            Sound.boss();
         });
 
         this.boundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());

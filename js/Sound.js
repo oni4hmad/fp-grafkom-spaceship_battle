@@ -44,3 +44,7 @@ export function game_over() {
 export function level_up() {
     new Sound('../assets/sounds/levelUpSound.wav').play();
 }
+
+export function boss() {
+    new Sound('../assets/sounds/bossSound.wav').play();
+}
