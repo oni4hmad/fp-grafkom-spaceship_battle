@@ -465,15 +465,15 @@ init();
 
 document.getElementById("start-btn").addEventListener("click", function() {
     if (game.isPaused)
-        this.togglePause();
-    this.clearUI();
+        game.togglePause();
+    game.clearUI();
     game.start = false;
     game.last_x_position = 0;
     game.level = 1;
     game.score = 0;
-    this.disposeSprite();
-    this.updateScore();
-    this.updateLevel();
+    game.disposeSprite();
+    game.updateScore();
+    game.updateLevel();
     initGame();
     game.start = true;
     Sound.game_start();
