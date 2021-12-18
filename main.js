@@ -7,6 +7,7 @@ import { addLight } from "./js/lights.js"
 import { Player } from "./js/Sprite/Player.js"
 import { Alien } from "./js/Sprite/Alien.js"
 import { Boss } from "./js/Sprite/Boss.js";
+import * as Sound from "./js/Sound.js";
 
 // Commons
 export const commons = Object.freeze ({
@@ -36,19 +37,23 @@ export const game = {
     start: false,
     isPaused: false,
     isAnimating: false,
+    isLoading: false,
     last_x_position: 0,
     gameOver: function() {
         document.getElementById("gameover").style.display = "block";
         document.getElementById("fill").style.display = "block";
         game.start = false;
         game.last_x_position = 0;
+        Sound.game_over();
         console.log("Game OVER!");
     },
     levelUp: function () {
         if (game.start)
             game.last_x_position = player.x;
         game.level++;
+        this.updateLevel();
         game.reload();
+        Sound.level_up();
     },
     addScore: function (score = 100) {
         game.score += score;
@@ -60,6 +65,9 @@ export const game = {
     updateHealth: function (health) {
         document.getElementById("health-value").innerHTML = health;
     },
+    updateLevel: function () {
+        document.getElementById("lvl-value").innerHTML = game.level;
+    },
     restart: function () {
         if (game.isPaused)
             this.togglePause();
@@ -70,8 +78,10 @@ export const game = {
         game.score = 0;
         this.disposeSprite();
         this.updateScore();
+        this.updateLevel();
         initGame();
         game.start = true;
+        Sound.game_start();
         if (!game.isAnimating)
             animate()
     },
@@ -109,11 +119,25 @@ export const game = {
             boss.dispose()
         boss = null;
     },
+    loadingUI: function () {
+        document.getElementById("loading").style.display = "block";
+        document.getElementById("fill").style.display = "block";
+    },
     clearUI: function () {
         document.getElementById("gamestart").style.display = "none";
+        document.getElementById("loading").style.display = "none";
         document.getElementById("gameover").style.display = "none";
         document.getElementById("pause").style.display = "none";
         document.getElementById("fill").style.display = "none";
+    },
+    isAllObjLoaded: function (...args) {
+        for(const obj of args) {
+            if (obj == null)
+                continue;
+            if(!obj.isLoaded)
+                return false;
+        }
+        return true;
     }
 }
 
@@ -127,9 +151,9 @@ let init = function () {
     scene = new THREE.Scene();
 
     // Camera
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    camera.position.y = 145;
-    camera.position.z = 275;
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+    camera.position.y = 80;
+    camera.position.z = 285;
 
     // Renderer
     renderer = new THREE.WebGLRenderer({alpha: false});
@@ -163,12 +187,12 @@ let init = function () {
             player.moveLeft = false;
         } else if (e.code == "KeyD") {
             player.moveRight = false;
-        } else if (e.code == "Space") {
+        } else if (e.code == "Space" && !game.isLoading) {
             player.initMissile();
         }
     });
     document.addEventListener("keyup", e => {
-        if (e.code == "Enter") {
+        if (e.code == "Enter" && !game.start) {
             game.restart()
         } else if (e.code == "KeyP") {
             game.togglePause()
@@ -196,12 +220,16 @@ let init = function () {
     controls = new OrbitControls(camera, renderer.domElement);
     controls.minDistance = 1;
     controls.maxDistance = 1000;
+    controls.enablePan = false;
+    controls.enableRotate = false;
+    controls.enableZoom = false;
+    
 
     // Helper
-    const gridHelper = new THREE.GridHelper( 400, 40, 0x0000ff, 0x808080 );
-    gridHelper.position.y = 0;
-    gridHelper.position.x = 0;
-    scene.add( gridHelper );
+    // const gridHelper = new THREE.GridHelper( 400, 40, 0x0000ff, 0x808080 );
+    // gridHelper.position.y = 0;
+    // gridHelper.position.x = 0;
+    // scene.add( gridHelper );
 }
 
 let initGame = function () {
@@ -209,6 +237,7 @@ let initGame = function () {
         player = new Player(game.last_x_position);
         player.health = commons.PLAYER_HEALTH;
     }
+
     if (game.level % 2 == 1) {
         // alien biasa
         const alien_row = 5;
@@ -224,21 +253,22 @@ let initGame = function () {
         boss = new Boss(0, commons.BOARD_MIN_Z);
     }
 
-    // Dat GUI
-    if (gui) gui.destroy();
-    gui = new dat.GUI()
-    let guiFolder = gui.addFolder('Camera Adjustment')
-    guiFolder.add(camera.position, 'x', -500, 500)
-    guiFolder.add(camera.position, 'y', -500, 500)
-    guiFolder.add(camera.position, 'z', -500, 500)
-    guiFolder.open()
-    guiFolder = gui.addFolder('Player Adjustment')
-    guiFolder.add(player, 'x', -500, 500)
-    guiFolder.add(player, 'z', -500, 500)
-    guiFolder.open()
-    guiFolder = gui.addFolder('Game Adjustment')
-    guiFolder.add(game, 'level', 0, 100).step(1)
-    guiFolder.open()
+    // // Dat GUI
+    // if (gui) gui.destroy();
+    // gui = new dat.GUI()
+    // let guiFolder = gui.addFolder('Camera Adjustment')
+    // guiFolder.add(camera.position, 'x', -500, 500)
+    // guiFolder.add(camera.position, 'y', -500, 500)
+    // guiFolder.add(camera.position, 'z', -500, 500)
+    // guiFolder.open()
+    // guiFolder = gui.addFolder('Player Adjustment')
+    // guiFolder.add(player, 'x', -500, 500)
+    // guiFolder.add(player, 'z', -500, 500)
+    // guiFolder.open()
+    // guiFolder = gui.addFolder('Game Adjustment')
+    // guiFolder.add(game, 'level', 0, 100).step(1)
+    // guiFolder.open()
+    // guiFolder.open()
 
     // Debug
     console.log("game inited!");
@@ -256,6 +286,19 @@ const animate = function() {
             console.log("requestAnimationFrame ended.")
         }
     }, 1000 / fps );
+
+    // check obj loading 
+    if (!game.isAllObjLoaded(player, ...aliens, boss)) {
+        if (!game.isLoading) {
+            game.loadingUI();
+            game.isLoading = true;
+        }
+        return;
+    } else {
+        if (game.isLoading)
+            game.isLoading = false;
+        game.clearUI();
+    }
 
     // player move, player missile move
     if (player) {
@@ -299,8 +342,8 @@ const animate = function() {
             alien.move();
             alien.initMissile();
             alien.moveMissile();
-            alien.mesh.rotation.x += 0.04;
-            alien.mesh.rotation.y += 0.04;
+            // alien.mesh.rotation.x += 0.04;
+            // alien.mesh.rotation.y += 0.04;
             alien.checkCollide([...player.missiles, player]);
             player.checkCollide([...alien.missiles])
             player.missiles.forEach(pm => pm.checkCollide([...alien.missiles]))
@@ -325,4 +368,4 @@ const animate = function() {
 
 init();
 // initGame();
-animate();
+// animate();

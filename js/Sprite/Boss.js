@@ -1,25 +1,31 @@
 import * as THREE from "../../node_modules/three/build/three.module.js";
+import { GLTFLoader } from "../../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
 import { scene, renderer } from "../../main.js"
 import { commons,  game } from "../../main.js"
 import { getRandomArbitrary, randomInt } from "../randomNumber.js"
+import * as Sound from "../Sound.js"
 
 export class Boss {
     constructor (positionX, positionZ) {
         const { w, h, d } = {w: commons.BOSS_WIDTH, h: commons.BOSS_HEIGHT, d: commons.BOSS_DEPTH};
-        // const geometry = new THREE.TorusKnotGeometry(25, 10);
-        const geometry = new THREE.BoxGeometry( w, h, d );
-        const material = new THREE.MeshPhongMaterial({
-            color: 0xf500bc
-        });
-        this.mesh = new THREE.Mesh( geometry, material );
-        this.mesh.castShadow = true;
-        this.mesh.receiveShadow = true;
-        this.mesh.position.x = positionX;
-        this.mesh.position.z = positionZ;
-        scene.add(this.mesh);
+        
+        this.isLoaded = false;
+        let loader = new GLTFLoader();
+        // let model_path = '../../assets/gltf/boss/scene.gltf';
+        let model_path = '../../assets/gltf/player/blender/alien ship/scene.gltf';
+        loadModel(loader, model_path).then(gltf_scene => {
+            this.mesh = gltf_scene;    
+            scene.add(this.mesh);
+            // this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
+            // scene.add(this.boxHelper);
+            
+            // load sound
+            // this.sound_gameOver = new Sound('../../assets/sounds/deathSound.wav');
+            // this.sound_getDamage = new Sound('../../assets/sounds/damageSound.wav')
+            // this.sound_levelUp = new Sound('../../assets/sounds/levelUpSound.wav');
 
-        this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
-        scene.add(this.boxHelper);
+            this.isLoaded = true;
+        });
 
         this.boundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 
@@ -30,18 +36,58 @@ export class Boss {
         this.speedX = 1;
         this.speedZ = 0.1;
         this.missiles = [];
-        this.health = 5 * game.level;
+        this.health = 7.5 * game.level;
         document.getElementById("bosshealth").style.display = "block";
         document.getElementById("boss-health-value").innerHTML = this.health;
 
         this.isAlive = true;
-        this.missileRate = game.level * 0.25; // % rate
-        this.maxMissile = 1 * Math.floor(game.level/2);
+        this.missileRate = game.level * 3; // % rate
+        this.maxMissile = 5 * Math.floor(game.level/2);
+        this.zOffset = 180;
 
+        function loadModel(loader, modelPath) {
+            // model loader
+            return new Promise((resolve, reject) => {
+                // const geometry = new THREE.BoxGeometry( w, h, d );
+                // const material = new THREE.MeshPhongMaterial({
+                //     color: 0xf500bc
+                // });
+                // let tempMesh = new THREE.Mesh( geometry, material );
+                // tempMesh.castShadow = true;
+                // tempMesh.receiveShadow = true;
+                // tempMesh.position.x = positionX;
+                // tempMesh.position.z = positionZ;
+                // resolve(tempMesh);
+
+                loader.load(modelPath, function(gltf) {
+                    let model = gltf.scene;
+                    model.scale.x = w/5;
+                    model.scale.y = h/5;
+                    model.scale.z = d/5;
+                    model.position.z = positionZ-100;
+                    model.position.x = positionX;
+                    // model.rotation.y = Math.PI / 2; // rotasi 90d
+                    model.traverse(n => { 
+                        if ( n.isMesh ) {
+                            n.castShadow = true; 
+                            n.receiveShadow = true;
+                            n.material.metalness = 0;
+                            n.geometry.computeBoundingBox();
+                        }
+                    });
+                    resolve(model);
+                },
+                undefined,
+                error => {
+                    console.error('An error happened.', error);
+                    reject(error);
+                });
+            })
+        }
         this.move = () => {
             this.x += this.speedX;
             this.z += this.speedZ;
-            this.boxHelper.update();
+            // this.boxHelper.update();
             // this.mesh.geometry.computeBoundingBox();
             this.boundingBox.setFromObject(this.mesh);
         }
@@ -61,6 +107,7 @@ export class Boss {
                             this.missiles.push(new BossMissile(this, this.x, this.z + this.depth/2));
                             break;
                     }
+                    Sound.alien_beam();
                 }
             }
         }
@@ -109,8 +156,8 @@ export class Boss {
             // remove alien from scene
             scene.remove(this.boxHelper);
             scene.remove(this.mesh);
-            this.mesh.geometry.dispose();
-            this.mesh.material.dispose();
+            // this.mesh.geometry.dispose();
+            // this.mesh.material.dispose();
             renderer.renderLists.dispose();
         }
     }
@@ -133,7 +180,7 @@ export class Boss {
             game.gameOver();
             this.dispose();
             console.log("alien take over you!")
-        } else if (this.mesh.position.z < commons.BOARD_MIN_Z) {
+        } else if (this.mesh.position.z < commons.BOARD_MIN_Z-this.zOffset) {
             this.mesh.position.z = commons.BOARD_MIN_Z
         }
     }
@@ -144,7 +191,7 @@ export class Boss {
 
 class BossMissile {
     constructor (alien, positionX, positionZ, typeL = false, typeR = false) {
-        const { w, h, d } = {w: 5, h: 5, d: 5};
+        const { w, h, d } = {w: 2, h: 2, d: 15};
         const geometry = new THREE.BoxGeometry( w, h, d );
         const material = new THREE.MeshPhongMaterial({
             color: 0xebbd34

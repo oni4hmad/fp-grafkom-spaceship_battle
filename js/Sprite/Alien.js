@@ -1,25 +1,30 @@
 import * as THREE from "../../node_modules/three/build/three.module.js";
+import { GLTFLoader } from "../../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
 import { scene, renderer } from "../../main.js"
 import { commons,  game } from "../../main.js"
 import { getRandomArbitrary } from "../randomNumber.js"
+import * as Sound from "../Sound.js"
 
 export class Alien {
     constructor (positionX, positionZ) {
         const { w, h, d } = {w: commons.ALIEN_WIDTH, h: commons.ALIEN_HEIGHT, d: commons.ALIEN_DEPTH};
-        // const geometry = new THREE.TorusKnotGeometry(25, 10);
-        const geometry = new THREE.BoxGeometry( w, h, d );
-        const material = new THREE.MeshPhongMaterial({
-            color: 0x4bff2b
-        });
-        this.mesh = new THREE.Mesh( geometry, material );
-        this.mesh.castShadow = true;
-        this.mesh.receiveShadow = true;
-        this.mesh.position.x = positionX;
-        this.mesh.position.z = positionZ;
-        scene.add(this.mesh);
+        
+        this.isLoaded = false;
+        let loader = new GLTFLoader();
+        // let model_path = '../../assets/gltf/player/blender/alien ship/scene.gltf';
+        let model_path = '../../assets/gltf/alien/scene.gltf';
+        loadModel(loader, model_path).then(gltf_scene => {
+            this.mesh = gltf_scene;    
+            scene.add(this.mesh);
+            // this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
+            // scene.add(this.boxHelper);
 
-        this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
-        scene.add(this.boxHelper);
+            // load sound
+            // this.sound_dead = new Sound('../../assets/sounds/hitmarkerSound.wav');
+            // this.sound_shoot = new Sound('../../assets/sounds/alienBeam.wav');
+
+            this.isLoaded = true;
+        });
 
         this.boundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 
@@ -29,17 +34,80 @@ export class Alien {
 
         this.speedX = 1;
         this.speedZ = 0.1;
+        this.moveLeft = this.speedX < 0;
+        this.moveRight = this.speedX > 0;
         this.missiles = [];
 
         this.isAlive = true;
         this.missileRate = 0.025 + (game.level * 0.015); // % rate
         this.maxMissile = 1 + Math.floor(game.level/2);
 
+        function loadModel(loader, modelPath) {
+            // model loader: low poly alien spaceship
+            return new Promise((resolve, reject) => {
+                // const geometry = new THREE.BoxGeometry( w, h, d );
+                // const material = new THREE.MeshPhongMaterial({
+                //     color: 0x4bff2b
+                // });
+                // let tempMesh = new THREE.Mesh( geometry, material );
+                // tempMesh.castShadow = true;
+                // tempMesh.receiveShadow = true;
+                // tempMesh.position.x = positionX;
+                // tempMesh.position.z = positionZ;
+                // resolve(tempMesh);
+
+                loader.load(modelPath, function(gltf) {
+                    let model = gltf.scene;
+                    model.scale.x = w/20;
+                    model.scale.y = h/20;
+                    model.scale.z = d/20;
+                    model.position.x = positionX;
+                    model.position.z = positionZ;
+                    model.traverse(n => { 
+                        if ( n.isMesh ) {
+                            n.castShadow = true; 
+                            n.receiveShadow = true;
+                            n.material.metalness = 0;
+                        }
+                    });
+                    resolve(model);
+                },
+                undefined,
+                error => {
+                    console.error('An error happened.', error);
+                    reject(error);
+                });
+            })
+        }
+        const reduceRotation = () => {
+            if (this.mesh.rotation.z < 0) {
+                this.mesh.rotation.z += 0.1;
+                if (this.mesh.rotation.z > 0)
+                    this.mesh.rotation.z = 0;
+            } else {
+                this.mesh.rotation.z -= 0.1;
+                if (this.mesh.rotation.z < 0)
+                    this.mesh.rotation.z = 0;
+            }
+        }
         this.move = () => {
+            if (this.moveRight) {
+                this.mesh.rotation.z -= 0.05;
+                if (this.mesh.rotation.z < -Math.PI/4)
+                    this.mesh.rotation.z = -Math.PI/4;
+            }
+            else if (this.moveLeft) {
+                this.mesh.rotation.z += 0.05;
+                if (this.mesh.rotation.z > Math.PI/4)
+                    this.mesh.rotation.z = Math.PI/4;
+            }
+            else if (this.mesh.rotation.z != 0) {
+                reduceRotation();
+            }
+
             this.x += this.speedX;
             this.z += this.speedZ;
-            this.boxHelper.update();
-            // this.mesh.geometry.computeBoundingBox();
+            // this.boxHelper.update();
             this.boundingBox.setFromObject(this.mesh);
         }
         this.initMissile = () => {
@@ -48,6 +116,8 @@ export class Alien {
                 if (rng <= this.missileRate){
                     const missile = new AlienMissile(this, this.x, this.z + this.depth/2);
                     this.missiles.push(missile);
+                    Sound.alien_beam();
+                    // this.sound_shoot.play();
                 }
             }
         }
@@ -72,9 +142,13 @@ export class Alien {
         }
         this.setMoveToLeft = () => {
             this.speedX = Math.abs(this.speedX) * (-1);
+            this.moveLeft = this.speedX < 0;
+            this.moveRight = this.speedX > 0;
         }
         this.setMoveToRight = () => {
             this.speedX = Math.abs(this.speedX);
+            this.moveLeft = this.speedX < 0;
+            this.moveRight = this.speedX > 0;
         }
         this.dispose = () => {
             this.isAlive = false;
@@ -84,9 +158,10 @@ export class Alien {
             // remove alien from scene
             scene.remove(this.boxHelper);
             scene.remove(this.mesh);
-            this.mesh.geometry.dispose();
-            this.mesh.material.dispose();
+            // this.mesh.geometry.dispose();
+            // this.mesh.material.dispose();
             renderer.renderLists.dispose();
+            // this.sound_dead.play();
         }
     }
     set x(updateX) {
@@ -119,10 +194,10 @@ export class Alien {
 
 class AlienMissile {
     constructor (alien, positionX, positionZ) {
-        const { w, h, d } = {w: 5, h: 5, d: 5};
+        const { w, h, d } = {w: 2, h: 2, d: 15};
         const geometry = new THREE.BoxGeometry( w, h, d );
         const material = new THREE.MeshPhongMaterial({
-            color: 0xebbd34
+            color: 0xff0000
         });
         this.mesh = new THREE.Mesh( geometry, material );
         this.mesh.castShadow = true;
@@ -131,7 +206,7 @@ class AlienMissile {
         this.mesh.position.z = positionZ;
         scene.add(this.mesh);
 
-        this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
+        this.boxHelper = new THREE.BoxHelper( this.mesh, 0xeb4034 );
         scene.add(this.boxHelper);
 
         this.boundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
@@ -147,7 +222,6 @@ class AlienMissile {
         this.move = () => {
             this.z += this.speedZ;
             this.boxHelper.update();
-            // this.mesh.geometry.computeBoundingBox();
             this.boundingBox.setFromObject(this.mesh);
         }
         this.dispose = () => {

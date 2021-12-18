@@ -1,16 +1,44 @@
 import * as THREE from "../../node_modules/three/build/three.module.js";
 import { GLTFLoader } from "../../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
-import { scene, renderer } from "../../main.js"
+import { scene, renderer, controls, camera } from "../../main.js"
 import { commons, game } from "../../main.js"
+import * as Sound from "../Sound.js"
+
+function _CalculateIdealOffset() {
+    const idealOffset = new THREE.Vector3(-400, 200, 0);
+    idealOffset.applyQuaternion( car.mesh.quaternion );
+    idealOffset.add( car.mesh.position );
+    return idealOffset;
+}
+
+function _CalculateIdealLookat() {
+    const idealLookat = new THREE.Vector3(0, 0, 0);
+    idealLookat.applyQuaternion( car.mesh.quaternion );
+    idealLookat.add( car.mesh.position );
+    // console.log( idealLookat );
+    return idealLookat;
+}
 
 export class Player {
     constructor (positionX = 0) {
         const { w, h, d } = {w: commons.PLAYER_WIDTH, h: commons.PLAYER_HEIGHT, d: commons.PLAYER_DEPTH};
-        this.mesh = initMesh();
-        scene.add(this.mesh);
 
-        this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
-        scene.add(this.boxHelper);
+        this.isLoaded = false;
+        let loader = new GLTFLoader();
+        let model_path = '../../assets/gltf/player/spaceship.gltf';
+        loadModel(loader, model_path).then(gltf_scene => {
+            this.mesh = gltf_scene;    
+            scene.add(this.mesh);
+            // this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
+            // scene.add(this.boxHelper);
+            
+            // load sound
+            // this.sound_gameOver = new Sound('../../assets/sounds/deathSound.wav');
+            // this.sound_getDamage = new Sound('../../assets/sounds/damageSound.wav')
+            // this.sound_levelUp = new Sound('../../assets/sounds/levelUpSound.wav');
+
+            this.isLoaded = true;
+        });
 
         this.boundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 
@@ -30,53 +58,94 @@ export class Player {
 
         this.isAlive = true;
 
-        function initMesh() {
-            const geometry = new THREE.BoxGeometry( w, h, d );
-            const material = new THREE.MeshPhongMaterial({
-                color: 0x0fd7ff
-            });
-            const tempMesh = new THREE.Mesh( geometry, material );
-            tempMesh.castShadow = true;
-            tempMesh.receiveShadow = true;
-            tempMesh.position.z = 180;
-            tempMesh.position.x = positionX;
-            return tempMesh;
-            
+        function loadModel(loader, modelPath) {
             // model loader: low poly spaceship
-            // let tempMesh;
-            // const loader = new GLTFLoader()
-            // loader.load('../../assets/gltf/player/scene.gltf', function(gltf){
-            //     tempMesh = gltf.scene;
-            //     tempMesh.scale.x = w/10;
-            //     tempMesh.scale.y = h/10;
-            //     tempMesh.scale.z = d/10;
-            //     tempMesh.position.z = 180;
-            //     tempMesh.position.x = positionX;
-            //     tempMesh.traverse(n => { 
-            //         if ( n.isMesh ) {
-            //             n.castShadow = true; 
-            //             n.receiveShadow = true;
-            //             n.geometry.computeBoundingBox();
-            //         }
-            //     });
-            // })
-            // return tempMesh;
+            return new Promise((resolve, reject) => {
+                // const geometry = new THREE.BoxGeometry( w, h, d );
+                // const material = new THREE.MeshPhongMaterial({
+                //     color: 0x4bff2b
+                // });
+                // let tempMesh = new THREE.Mesh( geometry, material );
+                // tempMesh.castShadow = true;
+                // tempMesh.receiveShadow = true;
+                // tempMesh.position.x = 0;
+                // tempMesh.position.z = commons.BOARD_MAX_Z;
+                // resolve(tempMesh);
+
+                loader.load(modelPath, function(gltf) {
+                    let model = gltf.scene;
+                    model.scale.x = w/75;
+                    model.scale.y = h/75;
+                    model.scale.z = d/75;
+                    model.position.z = commons.BOARD_MAX_Z;
+                    model.position.x = positionX;
+                    camera.position.x = positionX;
+                    controls.target.x = positionX;
+                    // model.rotation.y = Math.PI / 2; // rotasi 90d
+                    model.traverse(n => { 
+                        if ( n.isMesh ) {
+                            n.castShadow = true; 
+                            n.receiveShadow = true;
+                            n.material.metalness = 0;
+                            // n.geometry.computeBoundingBox();
+                        }
+                    });
+                    resolve(model);
+                },
+                undefined,
+                error => {
+                    console.error('An error happened.', error);
+                    reject(error);
+                });
+            })
         }
         this.initMissile = () => {
             if (this.missiles.length < this.maxMissile) {    
                 const missile = new PlayerMissile(this, this.x, this.z - this.depth/2);
                 this.missiles.push(missile);
+                Sound.player_bullet();
+                // new Sound('../../assets/sounds/bulletSound.wav').play();
+            }
+        }
+        const reduceRotation = () => {
+            if (this.mesh.rotation.z < 0) {
+                this.mesh.rotation.z += 0.1;
+                if (this.mesh.rotation.z > 0)
+                    this.mesh.rotation.z = 0;
+            } else {
+                this.mesh.rotation.z -= 0.1;
+                if (this.mesh.rotation.z < 0)
+                    this.mesh.rotation.z = 0;
             }
         }
         this.move = () => {
-            if (this.moveRight && this.moveLeft)
-                return;
-            else if (this.moveRight)
+            if (this.moveRight && this.moveLeft) {
+                reduceRotation();
+            }
+            else if (this.moveRight) {
                 this.x += this.speed;
-            else if (this.moveLeft)
+                this.mesh.rotation.z -= 0.1;
+                if (this.mesh.rotation.z < -Math.PI/4)
+                    this.mesh.rotation.z = -Math.PI/4;
+                if (this.x < commons.BOARD_MAX_X) {
+                    camera.position.x += this.speed;
+                    controls.target.x += this.speed;
+                }
+            }
+            else if (this.moveLeft) {
                 this.x -= this.speed;
-            this.boxHelper.update();
-            // this.mesh.geometry.computeBoundingBox();
+                this.mesh.rotation.z += 0.1;
+                if (this.mesh.rotation.z > Math.PI/4)
+                    this.mesh.rotation.z = Math.PI/4;
+                if (this.x > commons.BOARD_MIN_X) {
+                    camera.position.x -= this.speed;
+                    controls.target.x -= this.speed;
+                }
+            }
+            else if (this.mesh.rotation.z != 0) {
+                reduceRotation();
+            }
+            // this.boxHelper.update();
             this.boundingBox.setFromObject(this.mesh);
         }
         this.removeMissile = (missile) => {
@@ -92,6 +161,7 @@ export class Player {
             })
         }
         const gotAttack = (damage = 1) => {
+            // this.sound_getDamage.play();
             this.health -= damage;
             game.updateHealth(this.health);
             console.log(`Player Health: ${this.health}`)
@@ -101,16 +171,20 @@ export class Player {
             }
         }
         this.dispose = (isReload = false) => {
-            if (!isReload)
+            if (!isReload) {
                 game.gameOver();
+                // this.sound_gameOver.play();
+            } else {
+                // this.sound_levelUp.play();
+            }
             // remove all missiles
             while (this.missiles.length)
                 this.missiles.pop().dispose()
             // remove player from scene
             scene.remove(this.boxHelper);
             scene.remove(this.mesh);
-            this.mesh.geometry.dispose();
-            this.mesh.material.dispose();
+            // this.mesh.geometry.dispose();
+            // this.mesh.material.dispose();
             renderer.renderLists.dispose();
             console.log("Player Disposed.")
         }
@@ -139,7 +213,7 @@ export class Player {
 
 class PlayerMissile {
     constructor (player, positionX, positionZ) {
-        const { w, h, d } = {w: 5, h: 5, d: 5};
+        const { w, h, d } = {w: 2.5, h: 2.5, d: 15};
         const geometry = new THREE.BoxGeometry( w, h, d );
         const material = new THREE.MeshPhongMaterial({
             color: 0xffff00
@@ -151,8 +225,8 @@ class PlayerMissile {
         this.mesh.position.z = positionZ;
         scene.add(this.mesh);
 
-        this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
-        scene.add(this.boxHelper);
+        // this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
+        // scene.add(this.boxHelper);
 
         this.boundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 
@@ -166,7 +240,7 @@ class PlayerMissile {
 
         this.move = () => {
             this.z += this.speedZ;
-            this.boxHelper.update();
+            // this.boxHelper.update();
             // this.mesh.geometry.computeBoundingBox();
             this.boundingBox.setFromObject(this.mesh);
         }
