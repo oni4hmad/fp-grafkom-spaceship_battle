@@ -34,7 +34,6 @@ export function init() {
 
     stars = new THREE.Points(starGeometry,starMaterial);
     scene.add(stars);
-    console.log(stars);
 }
 
 export function animate() {

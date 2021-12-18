@@ -37,6 +37,7 @@ export class Player {
         
         this.missiles = [];
         this.maxMissile = 2 + game.level;
+        this.isPowered = false;
 
         this.moveRight = false;
         this.moveLeft = false;
@@ -85,11 +86,18 @@ export class Player {
             })
         }
         this.initMissile = () => {
-            if (this.missiles.length < this.maxMissile) {    
-                const missile = new PlayerMissile(this, this.x, this.z - this.depth/2);
-                this.missiles.push(missile);
+            if ((this.missiles.length < this.maxMissile) || this.isPowered) {
+                if (this.isPowered) {
+                    this.missiles.push(new PlayerMissile(this, this.x - 10, this.z - this.depth/2 + 5));
+                    this.missiles.push(new PlayerMissile(this, this.x, this.z - this.depth/2));
+                    this.missiles.push(new PlayerMissile(this, this.x + 10, this.z - this.depth/2 + 5));
+                    console.log('power!')
+                } else {
+                    const missile = new PlayerMissile(this, this.x, this.z - this.depth/2);
+                    this.missiles.push(missile);
+                    console.log('no powert!')
+                }
                 Sound.player_bullet();
-                // new Sound('../../assets/sounds/bulletSound.wav').play();
             }
         }
         const reduceRotation = () => {

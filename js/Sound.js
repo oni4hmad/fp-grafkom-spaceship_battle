@@ -51,3 +51,11 @@ export function boss() {
 export function damage() {
     new Sound('../assets/sounds/damageSound.wav').play();
 }
+
+export function hit() {
+    new Sound('../assets/sounds/hitmarkerSound.wav').play();
+}
+
+export function bonus() {
+    new Sound('../assets/sounds/bonusSound.wav').play();
+}

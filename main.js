@@ -11,6 +11,7 @@ import * as Stars from "./js/SpaceWarp.js";
 import * as Sound from "./js/Sound.js";
 import { Globe } from "./js/Globe.js";
 import * as Fog from "./js/Fog.js";
+import { BonusShip, initBonusShip } from "./js/Sprite/BonusShip.js";
 
 // Commons
 export const commons = Object.freeze ({
@@ -37,6 +38,7 @@ export const commons = Object.freeze ({
 export const game = {
     level: 1,
     score: 0,
+    powerTime: 10,
     start: false,
     isPaused: false,
     isAnimating: false,
@@ -62,6 +64,13 @@ export const game = {
         game.score += score;
         this.updateScore();
     },
+    addPower: function () {
+        if(player) player.isPowered = true;
+        powerClock.start();
+    },
+    removePower: function () {
+        if(player) player.isPowered = false;
+    },
     updateScore: function () {
         document.getElementById("score-value").innerHTML = game.score;
     },
@@ -70,6 +79,14 @@ export const game = {
     },
     updateLevel: function () {
         document.getElementById("lvl-value").innerHTML = game.level;
+    },
+    updatePower: function () {
+        if (player && player.isPowered) {
+            if (powerClock.getElapsedTime() > game.powerTime) {
+                powerClock.stop();
+                this.removePower();
+            }
+        }
     },
     restart: function () {
         if (game.isPaused)
@@ -120,7 +137,12 @@ export const game = {
         player = null;
         if (boss)
             boss.dispose()
+        if (bonusShip)
+            bonusShip.dispose()
         boss = null;
+    },
+    removeBonusShip: function () {
+        bonusShip = null;
     },
     loadingUI: function () {
         document.getElementById("loading").style.display = "block";
@@ -146,8 +168,10 @@ export const game = {
 
 // implementation
 export let scene, camera, renderer, controls;
-let player, aliens = [], boss;
+export let player, aliens = [], boss, bonusShip;
 let gui, globe;
+let rayCast, mouse;
+const powerClock = new THREE.Clock();
 
 let init = function () {
     // Scene
@@ -197,7 +221,7 @@ let init = function () {
     document.addEventListener("keyup", e => {
         if (e.code == "Enter" && !game.start) {
             game.restart()
-        } else if (e.code == "KeyP") {
+        } else if (e.code == "KeyP" && (game.start || game.isPaused)) {
             game.togglePause()
         } else if (e.code == "Backspace") {
             game.reload()
@@ -229,11 +253,37 @@ let init = function () {
     controls = new OrbitControls(camera, renderer.domElement);
     controls.minDistance = 1;
     controls.maxDistance = 1000;
-    // controls.enablePan = false;
-    // controls.enableRotate = false;
-    // controls.enableZoom = false;
-    controls.enabled=false
+    controls.enablePan = false;
+    controls.enableRotate = false;
+    controls.enableZoom = false;
+    // controls.enabled = false;
+
+    // Raycaster
+    rayCast = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+    mouse.x = mouse.y = -1;
     
+    // Click Event Listener
+    document.addEventListener("click", e => {
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+        mouse.z = camera.position.z;
+        rayCast.setFromCamera(mouse, camera);
+        
+        let intersects = rayCast.intersectObjects(scene.children);
+        for (let obj of intersects) {
+            if (!bonusShip) return;
+            bonusShip.mesh.traverse(n => {
+                if (n.isMesh) {
+                    if (obj.object === n){
+                        bonusShip.gotClick();
+                        bonusShip = null;
+                        return;
+                    }
+                }
+            });
+        }
+    }, false);
 
     // Helper
     // const gridHelper = new THREE.GridHelper( 400, 40, 0x0000ff, 0x808080 );
@@ -312,10 +362,19 @@ const animate = function() {
         game.clearUI();
     }
 
+    // bonus ship move
+    if (bonusShip) {
+        if (bonusShip.isLoaded) bonusShip.move();
+    } else {
+        if (bonusShip) bonusShip.dispose();
+        bonusShip = initBonusShip();
+    }
+
     // player move, player missile move
     if (player) {
         player.move();
         player.missiles.forEach(m => m.move())
+        game.updatePower();
     }
 
     // boss move, boss init missile

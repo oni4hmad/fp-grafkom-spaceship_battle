@@ -24,7 +24,22 @@
             background-color: black;
         }
 
+        .noselect {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
         .text {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             font-size: 15pt;
             font-weight: bolder;
@@ -131,12 +146,12 @@
     <div class="text" id="health-value">3</div>
     <div class="text" id="lvl-txt">Lvl:</div>
     <div class="text" id="lvl-value">-</div>
-    <div class="fixed-bottom ms-2">
+    <div class="fixed-bottom ms-2 noselect">
         <img src="assets/img/controls.png" alt="controls">
     </div>
     <div class="fixed-bottom me-2 mb-2 d-block">
         <div class="d-flex flex-row align-content-center justify-content-end">
-            <h6 class="p-2 py-1 rounded-3 text-white text-center fw-bolder bg-dark">P - Pause</h6>
+            <h6 class="noselect p-2 py-1 rounded-3 text-white text-center fw-bolder bg-dark">P - Pause</h6>
         </div>
     </div>
     <script type="module" src="./main.js"></script>
@@ -163,7 +178,7 @@
     </div>
 
     <!-- game start ui -->
-    <div id="gamestart" class="container">
+    <div id="gamestart" class="container noselect">
         <div class="row-center row-cols-1">
             <div class="text-title col-lg-12">
                 <h1 style="text-align:center;">SPACESHIP</h1>
@@ -176,7 +191,7 @@
     </div>
 
     <!-- loading ui -->
-    <div id="loading" class="container">
+    <div id="loading" class="container noselect">
         <div class="row-center row-cols-1">
             <div class="text-ui col-lg-12">
                 <h1 style="text-align:center;">Loading...</h1>
@@ -188,7 +203,7 @@
     </div>
 
     <!-- gameover ui -->
-    <div id="gameover" class="container">
+    <div id="gameover" class="container noselect">
         <div class="row-center row-cols-1">
             <div class="text-ui col-lg-12">
                 <h1 style="text-align:center;">Game Over</h1>
@@ -200,7 +215,7 @@
     </div>
 
     <!-- pause ui -->
-    <div id="pause" class="container">
+    <div id="pause" class="container noselect">
         <div class="row-center row-cols-1">
             <div class="text-ui col-lg-12">
                 <h1 style="text-align:center;">Pause</h1>
