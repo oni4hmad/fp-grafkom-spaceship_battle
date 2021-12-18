@@ -235,7 +235,7 @@ let init = function () {
         }
     });
     document.addEventListener("keyup", e => {
-        if (e.code == "Enter" && !game.start) {
+        if (e.code == "Enter") {
             game.restart()
         } else if (e.code == "KeyP" && (game.start || game.isPaused)) {
             game.togglePause()
