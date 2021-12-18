@@ -1,18 +1,21 @@
-import * as THREE from "./node_modules/three/build/three.module.js";
-import { OrbitControls } from "./node_modules/three/examples/jsm/controls/OrbitControls.js";
-import { GLTFLoader } from "./node_modules/three/examples/jsm/loaders/GLTFLoader.js";
-import * as dat from "./node_modules/three/examples/jsm/libs/dat.gui.module.js";
+import * as THREE from "./js/lib/three/three.module.js";
+import { OrbitControls } from "./js/lib/three/controls/OrbitControls.js";
+import { GLTFLoader } from "./js/lib/three/loaders/GLTFLoader.js";
+import * as dat from "./js/lib/dat.gui.module.js";
 
-import { addLight } from "./js/lights.js"
+import { addLight } from "./js/Lights.js"
 import { Player } from "./js/Sprite/Player.js"
 import { Alien } from "./js/Sprite/Alien.js"
 import { Boss } from "./js/Sprite/Boss.js";
+import * as Stars from "./js/SpaceWarp.js";
 import * as Sound from "./js/Sound.js";
+import { Globe } from "./js/Globe.js";
+import * as Fog from "./js/Fog.js";
 
 // Commons
 export const commons = Object.freeze ({
-    BOARD_MAX_X: 180,
-    BOARD_MIN_X: -180,
+    BOARD_MAX_X: 280,
+    BOARD_MIN_X: -280,
     BOARD_MAX_Z: 200, // default: 180
     BOARD_MIN_Z: -180,
     
@@ -144,7 +147,7 @@ export const game = {
 // implementation
 export let scene, camera, renderer, controls;
 let player, aliens = [], boss;
-let gui;
+let gui, globe;
 
 let init = function () {
     // Scene
@@ -216,13 +219,20 @@ let init = function () {
     ]);
     scene.background = textureCube;
 
+    // Space Warp (Stars particle)
+    Stars.init();
+
+    // Globe
+    globe = new Globe(0, 0, 0);
+
     // Controls
     controls = new OrbitControls(camera, renderer.domElement);
     controls.minDistance = 1;
     controls.maxDistance = 1000;
-    controls.enablePan = false;
-    controls.enableRotate = false;
-    controls.enableZoom = false;
+    // controls.enablePan = false;
+    // controls.enableRotate = false;
+    // controls.enableZoom = false;
+    controls.enabled=false
     
 
     // Helper
@@ -248,9 +258,11 @@ let initGame = function () {
                 aliens.push(new Alien((commons.ALIEN_WIDTH * j + distance * j) + commons.BOARD_MIN_X, (commons.ALIEN_DEPTH * i + distance * i) + commons.BOARD_MIN_Z));
             }
         }
+        Fog.fogAlien();
     } else {
         // boss
         boss = new Boss(0, commons.BOARD_MIN_Z);
+        Fog.fogBoss();
     }
 
     // // Dat GUI
@@ -288,7 +300,7 @@ const animate = function() {
     }, 1000 / fps );
 
     // check obj loading 
-    if (!game.isAllObjLoaded(player, ...aliens, boss)) {
+    if (!game.isAllObjLoaded(player, ...aliens, boss, globe)) {
         if (!game.isLoading) {
             game.loadingUI();
             game.isLoading = true;
@@ -360,6 +372,13 @@ const animate = function() {
             break;
         }
     }
+
+    // stars animate
+    Stars.animate();
+
+    // globe animate
+    globe.mesh.rotation.x += 0.001;
+    globe.mesh.rotation.y += 0.001;
 
     if (gui) gui.updateDisplay();
     controls.update();

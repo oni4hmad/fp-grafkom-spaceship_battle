@@ -24,7 +24,6 @@ for(let i = 0; i < 15; i++) {
 export function alien_beam() {
     let sound = beam_sounds.pop();
     beam_sounds.unshift(sound);
-    console.log(sound);
     sound.stop();
     sound.play();
 }
@@ -47,4 +46,8 @@ export function level_up() {
 
 export function boss() {
     new Sound('../assets/sounds/bossSound.wav').play();
+}
+
+export function damage() {
+    new Sound('../assets/sounds/damageSound.wav').play();
 }

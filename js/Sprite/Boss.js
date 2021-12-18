@@ -1,8 +1,8 @@
-import * as THREE from "../../node_modules/three/build/three.module.js";
-import { GLTFLoader } from "../../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+import * as THREE from "../../js/lib/three/three.module.js";
+import { GLTFLoader } from "../../js/lib/three/loaders/GLTFLoader.js";
 import { scene, renderer } from "../../main.js"
 import { commons,  game } from "../../main.js"
-import { getRandomArbitrary, randomInt } from "../randomNumber.js"
+import { getRandomArbitrary, randomInt } from "../RandomNumber.js"
 import * as Sound from "../Sound.js"
 
 export class Boss {
@@ -12,17 +12,12 @@ export class Boss {
         this.isLoaded = false;
         let loader = new GLTFLoader();
         // let model_path = '../../assets/gltf/boss/scene.gltf';
-        let model_path = '../../assets/gltf/player/blender/alien ship/scene.gltf';
+        let model_path = '../../assets/gltf/boss/scene.gltf';
         loadModel(loader, model_path).then(gltf_scene => {
             this.mesh = gltf_scene;    
             scene.add(this.mesh);
             // this.boxHelper = new THREE.BoxHelper( this.mesh, 0xff0000 );
             // scene.add(this.boxHelper);
-            
-            // load sound
-            // this.sound_gameOver = new Sound('../../assets/sounds/deathSound.wav');
-            // this.sound_getDamage = new Sound('../../assets/sounds/damageSound.wav')
-            // this.sound_levelUp = new Sound('../../assets/sounds/levelUpSound.wav');
 
             this.isLoaded = true;
             Sound.boss();

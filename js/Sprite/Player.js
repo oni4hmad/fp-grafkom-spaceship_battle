@@ -1,23 +1,8 @@
-import * as THREE from "../../node_modules/three/build/three.module.js";
-import { GLTFLoader } from "../../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+import * as THREE from "../../js/lib/three/three.module.js";
+import { GLTFLoader } from "../../js/lib/three/loaders/GLTFLoader.js";
 import { scene, renderer, controls, camera } from "../../main.js"
 import { commons, game } from "../../main.js"
 import * as Sound from "../Sound.js"
-
-function _CalculateIdealOffset() {
-    const idealOffset = new THREE.Vector3(-400, 200, 0);
-    idealOffset.applyQuaternion( car.mesh.quaternion );
-    idealOffset.add( car.mesh.position );
-    return idealOffset;
-}
-
-function _CalculateIdealLookat() {
-    const idealLookat = new THREE.Vector3(0, 0, 0);
-    idealLookat.applyQuaternion( car.mesh.quaternion );
-    idealLookat.add( car.mesh.position );
-    // console.log( idealLookat );
-    return idealLookat;
-}
 
 export class Player {
     constructor (positionX = 0) {
@@ -86,7 +71,7 @@ export class Player {
                         if ( n.isMesh ) {
                             n.castShadow = true; 
                             n.receiveShadow = true;
-                            n.material.metalness = 0;
+                            n.material.metalness = 0.25;
                             // n.geometry.computeBoundingBox();
                         }
                     });
@@ -125,8 +110,10 @@ export class Player {
             else if (this.moveRight) {
                 this.x += this.speed;
                 this.mesh.rotation.z -= 0.1;
-                if (this.mesh.rotation.z < -Math.PI/4)
+                camera.rotation.z -= 1;
+                if (this.mesh.rotation.z < -Math.PI/4) {
                     this.mesh.rotation.z = -Math.PI/4;
+                }
                 if (this.x < commons.BOARD_MAX_X) {
                     camera.position.x += this.speed;
                     controls.target.x += this.speed;
@@ -161,7 +148,7 @@ export class Player {
             })
         }
         const gotAttack = (damage = 1) => {
-            // this.sound_getDamage.play();
+            Sound.damage();
             this.health -= damage;
             game.updateHealth(this.health);
             console.log(`Player Health: ${this.health}`)

@@ -1,8 +1,8 @@
-import * as THREE from "../../node_modules/three/build/three.module.js";
-import { GLTFLoader } from "../../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+import * as THREE from "../../js/lib/three/three.module.js";
+import { GLTFLoader } from "../../js/lib/three/loaders/GLTFLoader.js";
 import { scene, renderer } from "../../main.js"
 import { commons,  game } from "../../main.js"
-import { getRandomArbitrary } from "../randomNumber.js"
+import { getRandomArbitrary } from "../RandomNumber.js"
 import * as Sound from "../Sound.js"
 
 export class Alien {
@@ -67,7 +67,7 @@ export class Alien {
                         if ( n.isMesh ) {
                             n.castShadow = true; 
                             n.receiveShadow = true;
-                            n.material.metalness = 0;
+                            n.material.metalness = .1;
                         }
                     });
                     resolve(model);
