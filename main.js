@@ -464,19 +464,5 @@ init();
 // animate();
 
 document.getElementById("start-btn").addEventListener("click", function() {
-    if (game.isPaused)
-        game.togglePause();
-    game.clearUI();
-    game.start = false;
-    game.last_x_position = 0;
-    game.level = 1;
-    game.score = 0;
-    game.disposeSprite();
-    game.updateScore();
-    game.updateLevel();
-    initGame();
-    game.start = true;
-    Sound.game_start();
-    if (!game.isAnimating)
-        animate()
+    game.restart();
 });

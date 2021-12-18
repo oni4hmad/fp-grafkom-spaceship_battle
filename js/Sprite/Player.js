@@ -122,7 +122,7 @@ export class Player {
                 }
                 if (this.x < commons.BOARD_MAX_X) {
                     camera.position.x += this.speed;
-                    controls.target.x += this.speed;
+                    controls.target.x += this.speed-0.7;
                 }
             }
             else if (this.moveLeft) {
@@ -132,7 +132,7 @@ export class Player {
                     this.mesh.rotation.z = Math.PI/4;
                 if (this.x > commons.BOARD_MIN_X) {
                     camera.position.x -= this.speed;
-                    controls.target.x -= this.speed;
+                    controls.target.x -= this.speed-0.7;
                 }
             }
             else if (this.mesh.rotation.z != 0) {
