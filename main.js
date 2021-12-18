@@ -235,7 +235,7 @@ let init = function () {
         }
     });
     document.addEventListener("keyup", e => {
-        if (e.code == "Enter") {
+        if (e.code == "Enter" && !game.start) {
             game.restart()
         } else if (e.code == "KeyP" && (game.start || game.isPaused)) {
             game.togglePause()
@@ -462,3 +462,7 @@ const animate = function() {
 init();
 // initGame();
 // animate();
+
+document.getElementById("start-btn").addEventListener("click", function() {
+    game.restart();
+});
