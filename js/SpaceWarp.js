@@ -25,7 +25,7 @@ export function init() {
     }
 
     starGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(vertices), 3 ) );
-    let sprite = new THREE.TextureLoader().load('../assets/raw/star.png');
+    let sprite = new THREE.TextureLoader().load('./../assets/raw/star.png');
     let starMaterial = new THREE.PointsMaterial({
         color: 0xaaaaaa,
         size: 0.7,
