@@ -12,7 +12,7 @@ export class Boss {
         this.isLoaded = false;
         let loader = new GLTFLoader();
         // let model_path = '../../assets/gltf/boss/scene.gltf';
-        let model_path = '/assets/gltf/boss/scene.gltf';
+        let model_path = window.location.href + '/assets/gltf/boss/scene.gltf';
         loadModel(loader, model_path).then(gltf_scene => {
             this.mesh = gltf_scene;    
             scene.add(this.mesh);

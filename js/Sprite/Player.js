@@ -10,7 +10,7 @@ export class Player {
 
         this.isLoaded = false;
         let loader = new GLTFLoader();
-        let model_path = '/assets/gltf/player/spaceship.gltf';
+        let model_path = window.location.href + '/assets/gltf/player/spaceship.gltf';
         loadModel(loader, model_path).then(gltf_scene => {
             this.mesh = gltf_scene;    
             scene.add(this.mesh);
