@@ -1,6 +1,6 @@
 import { scene, renderer } from "../main.js";
 import { commons, game } from "../main.js";
-import * as THREE from "../js/lib/three/three.module.js";
+import * as THREE from "./lib/three/three.module.js";
 import { GLTFLoader } from "../js/lib/three/loaders/GLTFLoader.js";
 
 export let starGeometry, stars;
