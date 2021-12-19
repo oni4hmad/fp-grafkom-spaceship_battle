@@ -256,12 +256,12 @@ let init = function () {
     // Panorama
     const panorama = new THREE.CubeTextureLoader();
     const textureCube = panorama.load([
-        'assets/panorama/px.png',
-        'assets/panorama/nx.png',
-        'assets/panorama/py.png',
-        'assets/panorama/ny.png',
-        'assets/panorama/pz.png',
-        'assets/panorama/nz.png'
+        'assets/panorama/px.jpg',
+        'assets/panorama/nx.jpg',
+        'assets/panorama/py.jpg',
+        'assets/panorama/ny.jpg',
+        'assets/panorama/pz.jpg',
+        'assets/panorama/nz.jpg'
     ]);
     scene.background = textureCube;
 
