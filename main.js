@@ -122,6 +122,7 @@ export const game = {
             this.togglePause();
         this.clearUI();
         this.disposeSprite();
+        this.removePowerMissileUI();
         initGame();
         game.start = true;
         if (!game.isAnimating)
