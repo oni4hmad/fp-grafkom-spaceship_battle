@@ -121,7 +121,6 @@ export const game = {
             this.togglePause();
         this.clearUI();
         this.disposeSprite();
-        this.removePowerMissileUI();
         initGame();
         game.start = true;
         if (!game.isAnimating)
@@ -166,6 +165,7 @@ export const game = {
         document.getElementById("gameover").style.display = "none";
         document.getElementById("pause").style.display = "none";
         document.getElementById("fill").style.display = "none";
+        this.removePowerMissileUI();
     },
     addPowerMissileUI: function() {
         document.getElementById("power-missile").style.display = "block";
