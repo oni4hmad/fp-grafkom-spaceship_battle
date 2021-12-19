@@ -1,5 +1,5 @@
 import * as THREE from "./lib/three/three.module.js";
-import { scene, renderer, controls, camera } from "../../main.js"
+import { scene, renderer, controls, camera } from "../main.js"
 
 export function fogBoss() {
   let near = 500;
