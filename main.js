@@ -102,6 +102,7 @@ export const game = {
         if (game.isPaused)
             this.togglePause();
         this.clearUI();
+        this.removePowerMissileUI();
         game.start = false;
         game.last_x_position = 0;
         game.last_c_targetX = 0;
@@ -165,7 +166,6 @@ export const game = {
         document.getElementById("gameover").style.display = "none";
         document.getElementById("pause").style.display = "none";
         document.getElementById("fill").style.display = "none";
-        this.removePowerMissileUI();
     },
     addPowerMissileUI: function() {
         document.getElementById("power-missile").style.display = "block";
