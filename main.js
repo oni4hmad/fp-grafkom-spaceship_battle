@@ -104,6 +104,7 @@ export const game = {
         this.clearUI();
         game.start = false;
         game.last_x_position = 0;
+        game.last_c_targetX = 0;
         game.level = 1;
         game.score = 0;
         this.disposeSprite();
