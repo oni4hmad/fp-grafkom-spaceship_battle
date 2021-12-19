@@ -12,7 +12,7 @@ export class Alien {
         this.isLoaded = false;
         let loader = new GLTFLoader();
         // let model_path = './../assets/gltf/player/blender/alien ship/scene.gltf';
-        let model_path = './assets/gltf/alien/scene.gltf';
+        let model_path = '/assets/gltf/alien/scene.gltf';
         loadModel(loader, model_path).then(gltf_scene => {
             this.mesh = gltf_scene;    
             scene.add(this.mesh);
