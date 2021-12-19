@@ -1,6 +1,6 @@
-import * as THREE from "../../js/lib/three/three.module.js";
-import { GLTFLoader } from "../../js/lib/three/loaders/GLTFLoader.js";
-import { scene, renderer, controls, camera } from "../../main.js"
+import * as THREE from "../js/lib/three/three.module.js";
+import { GLTFLoader } from "../js/lib/three/loaders/GLTFLoader.js";
+import { scene, renderer, controls, camera } from "../main.js"
 
 export class Globe {
     constructor(positionX, positionY, positionZ) {
